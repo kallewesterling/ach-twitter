@@ -1,0 +1,164 @@
+---
+---
+
+<html>
+
+  <head>
+    <script src="includes/js/Chart.min.js"></script>
+    <script src="includes/js/jquery/jquery-3.4.1.min.js"></script>
+    <script src="includes/js/bootstrap-4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="includes/js/bootstrap-4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="includes/css/Chart.min.css"></load>
+		<script src="https://kit.fontawesome.com/fc335a03bd.js"></script>
+  </head>
+
+
+  <body>
+    <div class="container">
+      <div class="row">
+
+        <canvas id="sessionChart" width="800" height="450"></canvas>
+
+      </div>
+
+      <a name="scrollTo"></a>
+      {% for x in site.data.session-tweets %}
+        <div class="collapse" id="{{ x[0] | upcase }}">
+          <div class="row">
+            <div class="col-12">
+              {% assign session_code = x[0] | upcase %}
+              {% assign session = site.data.sessions | map: session_code %}
+              <h1>{{ session }} ({{ x[0] | upcase }})</h1>
+            </div>
+          </div>
+          <div class="row">
+            {% for tweet in x[1] %}
+            <div class="col-12 col-md-6 pb-4">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">{{ tweet.user_name  }}</h5>
+                  <h6 class="card-subtitle mb-2 text-muted">{{ tweet.created_at  }}</h6>
+                  <p class="card-text">{{ tweet.full_text  }}</p>
+                  <a href="http://www.twitter.com/{{tweet.screen_name}}/status/{{ tweet.id }}" class="card-link stretched-link"><i class="fab fa-twitter"></i></a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+
+    </div>
+
+<!-- // data not reliable so skipping this...
+
+    <hr />
+
+
+    <div class="container">
+      <div class="row">
+
+        <canvas id="workshopChart" width="800" height="450"></canvas>
+
+      </div>
+
+      {% for x in site.data.workshop-tweets %}
+        <a name="{{ x[0] | upcase }}"></a><div class="collapse" id="{{ x[0] | upcase }}">
+          <div class="row">
+            <div class="col-12">
+              {% assign session_code = x[0] | upcase %}
+              {% assign session = site.data.sessions | map: session_code %}
+              <h1>{{ session }} ({{ x[0] | upcase }})</h1>
+            </div>
+          </div>
+          <div class="row">
+            {% for tweet in x[1] %}
+            <div class="col-6 pb-4">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">{{ tweet.user_name  }}</h5>
+                  <h6 class="card-subtitle mb-2 text-muted">{{ tweet.created_at  }}</h6>
+                  <p class="card-text">{{ tweet.full_text  }}</p>
+                  <a href="http://www.twitter.com/{{tweet.screen_name}}/status/{{ tweet.id }}" class="card-link stretched-link">Open tweet</a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+
+    </div>
+
+
+-->
+
+
+
+    <script>
+
+      var sleep = function(ms) {
+          return new Promise(resolve => setTimeout(resolve, ms));
+      };
+
+      var scrollTo = async function(id) {
+          console.log(id);
+          $('.collapse.show').collapse('hide');
+          $('#'+id).collapse('show');
+          var aTag = $("a[name='scrollTo']");
+          $('html,body').animate({scrollTop: aTag.offset().top},'slow');
+      };
+
+      // Bar chart
+      new Chart(document.getElementById("sessionChart"), {
+          type: 'bar',
+          data: {
+            labels: [{% for x in site.data.session-data.labels %}{% assign session_code = x | upcase %}"{{ x | upcase }}", {% endfor %}],
+            datasets: [
+              {
+                label: "no. of tweets",
+                backgroundColor: [],
+                data: [{% for x in site.data.session-data.data %}"{{ x }}", {% endfor %}]
+              }
+            ]
+          },
+          options: {
+            legend: { display: false },
+            title: {
+              display: true,
+              text: 'Tweets by session (#SXX) at #ACH2019'
+            },
+            'onClick' : function (evt, item) {
+                if (item[0] != undefined) { scrollTo(item[0]['_view']['label']); } // scrollTo(item[0]['_index']
+            }
+          }
+      });
+
+      // Bar chart
+      new Chart(document.getElementById("workshopChart"), {
+          type: 'bar',
+          data: {
+            labels: [{% for x in site.data.workshop-data.labels %}{% assign session_code = x | upcase %}"{{ x | upcase }}", {% endfor %}],
+            datasets: [
+              {
+                label: "no. of tweets",
+                backgroundColor: [],
+                data: [{% for x in site.data.workshop-data.data %}"{{ x }}", {% endfor %}]
+              }
+            ]
+          },
+          options: {
+            legend: { display: false },
+            title: {
+              display: true,
+              text: 'Tweets by session (#SXX) at #ACH2019'
+            },
+            'onClick' : function (evt, item) {
+                if (item[0] != undefined) { scrollTo(item[0]['_view']['label']); } // scrollTo(item[0]['_index']
+            }
+          }
+      });
+
+    </script>
+  </body>
+</html>
